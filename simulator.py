@@ -44,6 +44,8 @@ class Simulator:
         L1_rw = 0
         L2_rw = 0
         DRAM_rw = 0
+        L1_hit = 0
+        L2_hit = 0
         with open(file_name, 'r') as file:
             for line in file:
                 # Split the line into individual values
@@ -66,6 +68,7 @@ class Simulator:
                     L1_rw += 1
                     if self.L1.data[index_L1].tag == tag_L1:
                         gotHit = True
+                        L1_hit += 1
                         print("L1")
 
                     # try L2 cache
@@ -75,6 +78,7 @@ class Simulator:
                         for cLine in self.L2.data[index_L2]:
                             if cLine.tag == tag_L2:
                                 gotHit = True
+                                L2_hit += 1
                                 # swap data in L1 & L2
                                 oldL1_tag = str(self.L1.data[index_L1].tag)
                                 oldL1_bytes = str(self.L1.data[index_L1].bytes)
@@ -101,14 +105,12 @@ class Simulator:
                             if cLine.tag == "":
                                 stored = True
                                 time += 5
-                                L2_rw += 1
                                 cLine.tag = tag_L2
                                 cLine.bytes = value
                                 break
                         # empty spot not found replace random cache line
                         if not stored:
                             time += 5
-                            L2_rw += 1
                             idx = random.randint(0, 3)
                             self.ran += 1
                             # *** figure out wrtie timing
@@ -125,6 +127,7 @@ class Simulator:
                     L1_rw += 1
                     if self.L1.data[index_L1].tag == tag_L1:
                         gotHit = True
+                        L1_hit += 1
                         self.L1.data[index_L1].bytes = value
                         self.L1.data[index_L1].dirty = True
 
@@ -135,6 +138,7 @@ class Simulator:
                         for cLine in self.L2.data[index_L2]:
                             if cLine.tag == tag_L2:
                                 gotHit = True
+                                L2_hit += 1
                                 # swap data in L1 & L2
                                 oldL1_tag = str(self.L1.data[index_L1].tag)
                                 oldL1_bytes = str(self.L1.data[index_L1].bytes)
@@ -148,7 +152,7 @@ class Simulator:
 
                                 cLine.tag = oldL1_tag
                                 cLine.bytes = oldL1_bytes
-                                cLine.dirty = oldL1_dirty 
+                                cLine.dirty = oldL1_dirty
                                 break
 
                     # have to go to DRAM & store in L2
@@ -161,7 +165,6 @@ class Simulator:
                             if cLine.tag == "":
                                 stored = True
                                 time += 5
-                                L2_rw += 1
                                 cLine.tag = tag_L2
                                 cLine.bytes = value
                                 break
@@ -172,7 +175,6 @@ class Simulator:
                             if self.L2.data[index_L2][idx].dirty:
                                 print("WRITE BACK TO MEMORY")
                             time += 5
-                            L2_rw += 1
                             self.L2.data[index_L2][idx].tag = tag_L2
                             self.L2.data[index_L2][idx].bytes = value
                             self.L2.data[index_L2][idx].dirty = False
@@ -184,13 +186,13 @@ class Simulator:
                     L1_rw += 1
                     if self.L1.instructions[index_L1].tag == tag_L1:
                         gotHit = True
+                        L1_hit += 1
                     
                     # check DRAM for instruction & store in L1
                     if not gotHit:
                         time += 50
                         DRAM_rw += 1
                         time += 0.5
-                        L1_rw += 1
                         self.L1.instructions[index_L1].tag = tag_L1
                         self.L1.instructions[index_L1].bytes = value
 
@@ -213,8 +215,10 @@ class Simulator:
         print("L2 COUNT: ", L2_rw)
         print("DRAM COUNT: ", DRAM_rw)
         print("RANDOM: ", self.ran)
+        print("L1 HIT RATE: ", L1_hit/L1_rw)
+        print("L2 HIT: ", L2_hit/L2_rw)
 
 
 
 sim = Simulator()
-sim.simulate('026.compress.din')
+sim.simulate('013.spice2g6.din')
