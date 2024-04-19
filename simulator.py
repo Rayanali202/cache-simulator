@@ -231,5 +231,6 @@ class Simulator:
         print("RANDOM: ", self.ran)
 
 
+
 sim = Simulator()
 sim.simulate('026.compress.din')
