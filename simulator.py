@@ -195,27 +195,8 @@ class Simulator:
                     print("IGNORE")
 
                 elif op == '4':
-                    # flush L1 cache
-                    for cLine in self.L1.data:
-                        if cLine.dirty:
-                            time += 50
-                            DRAM_rw += 1
-                            print("WRITE BACK TO MEMORY")
+                    print("IGNORE")
                     
-                    for cLine in self.L1.instructions:
-                        if cLine.dirty:
-                            time += 50
-                            DRAM_rw += 1
-                            print("WRITE BACK TO MEMORY")
-
-                    # flush L2 cache
-                    for r in range(len(self.L2.data)):
-                        for c in range(len(self.L2.data[r])):
-                            if self.L2.data[r][c].dirty:
-                                time += 50
-                                DRAM_rw += 1
-                                print("WRITE BACK TO MEMORY")
-
         print(time)
         L1_idle = (time - 0.5 * L1_rw)/0.5
         L1_energy = L1_idle * 0.5 + L1_rw * 1
