@@ -75,17 +75,20 @@ class Simulator:
                         for cLine in self.L2.data[index_L2]:
                             if cLine.tag == tag_L2:
                                 gotHit = True
-                                # transfer data to L1 & remove from L2
-                                if self.L1.data[index_L1].dirty:
-                                    time += 50
-                                    DRAM_rw += 1
-                                    print("WRITE BACK TO MEMORY")
-                                time += 0.5
-                                L1_rw += 1
-                                self.L1.data[index_L1].tag = tag_L1
+                                # swap data in L1 & L2
+                                oldL1_tag = str(self.L1.data[index_L1].tag)
+                                oldL1_bytes = str(self.L1.data[index_L1].bytes)
+                                oldL1_dirty = str(self.L1.data[index_L1].dirty)
+
+                                # *** figure out write timing
+
+                                self.L1.data[index_L1].tag = cLine.tag
                                 self.L1.data[index_L1].bytes = cLine.bytes
                                 self.L1.data[index_L1].dirty = cLine.dirty
-                                cLine = cache.cacheLine()    
+
+                                cLine.tag = oldL1_tag
+                                cLine.bytes = oldL1_bytes
+                                cLine.dirty = oldL1_dirty
                                 break
 
                     # have to go to DRAM & store in L2
@@ -108,9 +111,8 @@ class Simulator:
                             L2_rw += 1
                             idx = random.randint(0, 3)
                             self.ran += 1
+                            # *** figure out wrtie timing
                             if self.L2.data[index_L2][idx].dirty:
-                                time += 50
-                                DRAM_rw += 1
                                 print("WRITE BACK TO MEMORY")
                             self.L2.data[index_L2][idx].tag = tag_L2
                             self.L2.data[index_L2][idx].bytes = value
@@ -133,17 +135,20 @@ class Simulator:
                         for cLine in self.L2.data[index_L2]:
                             if cLine.tag == tag_L2:
                                 gotHit = True
-                                if self.L1.data[index_L1].dirty:
-                                    time += 50
-                                    DRAM_rw += 1
-                                    print("WRITE BACK TO MEMORY")
-                                time += 0.5
-                                L1_rw += 1
-                                # ** change cLine according to write
-                                self.L1.data[index_L1].tag = tag_L1
+                                # swap data in L1 & L2
+                                oldL1_tag = str(self.L1.data[index_L1].tag)
+                                oldL1_bytes = str(self.L1.data[index_L1].bytes)
+                                oldL1_dirty = str(self.L1.data[index_L1].dirty)
+
+                                # *** figure out write timing
+                                # *** update value in cLine.bytes
+                                self.L1.data[index_L1].tag = cLine.tag
                                 self.L1.data[index_L1].bytes = cLine.bytes
                                 self.L1.data[index_L1].dirty = True
-                                cLine = cache.cacheLine()   
+
+                                cLine.tag = oldL1_tag
+                                cLine.bytes = oldL1_bytes
+                                cLine.dirty = oldL1_dirty 
                                 break
 
                     # have to go to DRAM & store in L2
@@ -165,8 +170,6 @@ class Simulator:
                             idx = random.randint(0, 3)
                             self.ran += 1
                             if self.L2.data[index_L2][idx].dirty:
-                                time += 50
-                                DRAM_rw += 1
                                 print("WRITE BACK TO MEMORY")
                             time += 5
                             L2_rw += 1
