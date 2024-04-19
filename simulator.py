@@ -90,9 +90,10 @@ class Simulator:
                                 self.L1.data[index_L1].bytes = cLine.bytes
                                 self.L1.data[index_L1].dirty = cLine.dirty
 
-                                cLine.tag = oldL1_tag
+                                '''cLine.tag = oldL1_tag
                                 cLine.bytes = oldL1_bytes
-                                cLine.dirty = oldL1_dirty
+                                cLine.dirty = oldL1_dirty'''
+                                cLine = cache.cacheLine()
                                 break
 
                     # have to go to DRAM & store in L2
@@ -103,6 +104,7 @@ class Simulator:
                         for cLine in self.L2.data[index_L2]:
                             # check for empty
                             if cLine.tag == "":
+                                print("FOUND")
                                 stored = True
                                 time += 5
                                 cLine.tag = tag_L2
@@ -150,9 +152,10 @@ class Simulator:
                                 self.L1.data[index_L1].bytes = cLine.bytes
                                 self.L1.data[index_L1].dirty = True
 
-                                cLine.tag = oldL1_tag
+                                '''cLine.tag = oldL1_tag
                                 cLine.bytes = oldL1_bytes
-                                cLine.dirty = oldL1_dirty
+                                cLine.dirty = oldL1_dirty'''
+                                cLine = cache.cacheLine()
                                 break
 
                     # have to go to DRAM & store in L2
@@ -163,6 +166,7 @@ class Simulator:
                         for cLine in self.L2.data[index_L2]:
                             # check for empty
                             if cLine.tag == "":
+                                print("FOUND")
                                 stored = True
                                 time += 5
                                 cLine.tag = tag_L2
@@ -221,4 +225,4 @@ class Simulator:
 
 
 sim = Simulator()
-sim.simulate('013.spice2g6.din')
+sim.simulate('048.ora.din')
