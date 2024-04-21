@@ -8,22 +8,6 @@ class Simulator:
         self.L2 = cache.L2()
         self.ran = 0
     
-    '''def hash_L1(self, input_string):
-        # Calculate the SHA-256 hash value of the input string from 0 - 9
-        sha256_hash = hashlib.sha256(input_string.encode())
-        hash_value = sha256_hash.hexdigest()
-        hash_integer = int(hash_value, 16)
-        mapped_value = hash_integer % 10
-        return mapped_value
-
-    def hash_L2(self, input_string):
-        # Calculate the SHA-256 hash value of the input string from 0 - 999
-        sha256_hash = hashlib.sha256(input_string.encode())
-        hash_value = sha256_hash.hexdigest()
-        hash_integer = int(hash_value, 16)
-        mapped_value = hash_integer % 1000
-        return mapped_value
-    '''
     def hexToBinary(self, hex_string):
         binary_string = ""
 
@@ -79,24 +63,15 @@ class Simulator:
                             if cLine.tag == tag_L2:
                                 gotHit = True
                                 L2_hit += 1
-                                # swap data in L1 & L2
-                                oldL1_tag = str(self.L1.data[index_L1].tag)
-                                oldL1_bytes = str(self.L1.data[index_L1].bytes)
-                                oldL1_dirty = str(self.L1.data[index_L1].dirty)
-
                                 # *** figure out write timing
 
+                                # move cache line up to L1
                                 self.L1.data[index_L1].tag = cLine.tag
                                 self.L1.data[index_L1].bytes = cLine.bytes
                                 self.L1.data[index_L1].dirty = cLine.dirty
-
-                                '''cLine.tag = oldL1_tag
-                                cLine.bytes = oldL1_bytes
-                                cLine.dirty = oldL1_dirty'''
-                                cLine = cache.cacheLine()
                                 break
 
-                    # have to go to DRAM & store in L2
+                    # have to go to DRAM & store in L2 and L1
                     if not gotHit:
                         time += 50
                         DRAM_rw += 1
@@ -104,23 +79,28 @@ class Simulator:
                         for cLine in self.L2.data[index_L2]:
                             # check for empty
                             if cLine.tag == "":
-                                print("FOUND")
                                 stored = True
                                 time += 5
                                 cLine.tag = tag_L2
                                 cLine.bytes = value
+                                self.L1.data[index_L1].tag = tag_L2
+                                self.L1.data[index_L1].bytes = value
+                                self.L1.data[index_L1].dirty = False
                                 break
                         # empty spot not found replace random cache line
                         if not stored:
                             time += 5
                             idx = random.randint(0, 3)
                             self.ran += 1
-                            # *** figure out wrtie timing
+                            # *** figure out write timing
                             if self.L2.data[index_L2][idx].dirty:
                                 print("WRITE BACK TO MEMORY")
                             self.L2.data[index_L2][idx].tag = tag_L2
                             self.L2.data[index_L2][idx].bytes = value
                             self.L2.data[index_L2][idx].dirty = False
+                            self.L1.data[index_L1].tag = tag_L2
+                            self.L1.data[index_L1].bytes = value
+                            self.L1.data[index_L1].dirty = False
 
                 elif op == '1':
                     gotHit = False
@@ -132,6 +112,12 @@ class Simulator:
                         L1_hit += 1
                         self.L1.data[index_L1].bytes = value
                         self.L1.data[index_L1].dirty = True
+                        for cLine in self.L2.data[index_L2]:
+                            # check for empty
+                            if cLine.tag == tag_L2:
+                                cLine.bytes = value
+                                cLine.dirty = True
+                                break
 
                     # try L2 cache
                     if not gotHit:
@@ -141,21 +127,14 @@ class Simulator:
                             if cLine.tag == tag_L2:
                                 gotHit = True
                                 L2_hit += 1
-                                # swap data in L1 & L2
-                                oldL1_tag = str(self.L1.data[index_L1].tag)
-                                oldL1_bytes = str(self.L1.data[index_L1].bytes)
-                                oldL1_dirty = str(self.L1.data[index_L1].dirty)
 
                                 # *** figure out write timing
                                 # *** update value in cLine.bytes
+                                cLine.bytes = value
+                                cLine.dirty = True
                                 self.L1.data[index_L1].tag = cLine.tag
                                 self.L1.data[index_L1].bytes = cLine.bytes
                                 self.L1.data[index_L1].dirty = True
-
-                                '''cLine.tag = oldL1_tag
-                                cLine.bytes = oldL1_bytes
-                                cLine.dirty = oldL1_dirty'''
-                                cLine = cache.cacheLine()
                                 break
 
                     # have to go to DRAM & store in L2
@@ -166,11 +145,13 @@ class Simulator:
                         for cLine in self.L2.data[index_L2]:
                             # check for empty
                             if cLine.tag == "":
-                                print("FOUND")
                                 stored = True
                                 time += 5
                                 cLine.tag = tag_L2
                                 cLine.bytes = value
+                                self.L1.data[index_L1].tag = tag_L2
+                                self.L1.data[index_L1].bytes = value
+                                self.L1.data[index_L1].dirty = False
                                 break
                         # empty spot not found replace random cache line
                         if not stored:
@@ -182,6 +163,9 @@ class Simulator:
                             self.L2.data[index_L2][idx].tag = tag_L2
                             self.L2.data[index_L2][idx].bytes = value
                             self.L2.data[index_L2][idx].dirty = False
+                            self.L1.data[index_L1].tag = tag_L2
+                            self.L1.data[index_L1].bytes = value
+                            self.L1.data[index_L1].dirty = False
 
                 elif op == '2':
                     gotHit = False
@@ -225,4 +209,4 @@ class Simulator:
 
 
 sim = Simulator()
-sim.simulate('048.ora.din')
+sim.simulate('085.gcc.din')
