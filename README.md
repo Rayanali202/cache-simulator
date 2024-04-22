@@ -18,6 +18,6 @@ Writes works pretty similar to reads with slight differences. We start by checki
 **2 Set Associativity**
 
 **4 Set Associativity**
-<img src="4setdata.png" width="800" height="600">
+![Image Alt Text](4sets1.png)
 
 **8 Set Associativity**
