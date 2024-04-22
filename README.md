@@ -1,8 +1,8 @@
 # Cache Simulator
 
-Program starts by converting hex address to a 32 bit binary string. Starting from the right the first 6 bits are the offset bits for the 64B cache line. The next 9 bits represent the L1 cache index and the next 10 represent the L2 cache index. The remaining bits are the Tag bits.
+Program starts by converting hex address to a 32 bit binary string. Starting from the right the first 6 bits are the offset bits for the 64B cache line. The next 9 bits represent the L1 cache index and the next 10 (could be 9 or 11 based on set associativity) represent the L2 cache index. The remaining bits are the Tag bits.
 
-![Image Alt Text](bits.png)
+![Image Alt Text](images/bits.png)
 
 **Code Explanation**
 The logic behind the cache simulator occurs in the 'simulate()' function in the Simulator class.
@@ -16,13 +16,13 @@ Writes works pretty similar to reads with slight differences. We start by checki
 # Results 
 
 **2 Set Associativity**
-![Image Alt Text](2sets1.png)
-![Image Alt Text](2sets2.png)
+![Image Alt Text](images/2sets1.png)
+![Image Alt Text](images/2sets2.png)
 
 **4 Set Associativity**
-![Image Alt Text](4sets1.png)
-![Image Alt Text](4sets2.png)
+![Image Alt Text](images/4sets1.png)
+![Image Alt Text](images/4sets2.png)
 
 **8 Set Associativity**
-![Image Alt Text](8sets1.png)
-![Image Alt Text](8sets2.png)
+![Image Alt Text](images/8sets1.png)
+![Image Alt Text](images/8sets2.png)

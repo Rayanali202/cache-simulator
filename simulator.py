@@ -1,7 +1,7 @@
 import cache
 import random
 import statistics
-from tabulate import tabulate
+import math
 
 class Simulator:
     def __init__(self, assoc):
@@ -40,15 +40,15 @@ class Simulator:
                 # Split the line into individual values
                 values = line.strip().split()
                 op = values[0]
-                curAddress = values[1]
-                value = values[2]
+                value = self.hexToBinary(values[2])
 
                 binaryAddress = self.hexToBinary(values[1])
                 offset = binaryAddress[-6:]
                 index_L1 = int(binaryAddress[-15:-6], 2) % 499
-                index_L2 = int(binaryAddress[-15:-6], 2) % 499
+                length = math.ceil(math.log(int(4000/self.associativity), 2))
+                index_L2 = int(binaryAddress[-6 - length:-6], 2) % (int(4000/self.associativity) - 1)
                 tag_L1 = int(binaryAddress[:-15], 2)
-                tag_L2 = int(binaryAddress[:-15], 2)
+                tag_L2 = int(binaryAddress[:-6 - length], 2)
 
                 if op == '0':
                     gotHit = False
@@ -238,9 +238,7 @@ class Simulator:
 
 if __name__ == "__main__":
     file_names = ['008.espresso.din', '013.spice2g6.din', '015.doduc.din', '022.li.din', '023.eqntott.din', '026.compress.din', '034.mdljdp2.din', '039.wave5.din', '047.tomcatv.din', '048.ora.din', '085.gcc.din', '089.su2cor.din', '090.hydro2d.din', '093.nasa7.din', '094.fpppp.din']
-    table_data = []
     for name in file_names:
-        table = []
         print("-------------------------------------------")
         print(name.upper())
         print()
@@ -254,9 +252,10 @@ if __name__ == "__main__":
         DRAMActiveEnergy = []
         penalties = []
         times = []
+        access_times = []
         # run trace ten times
         for _ in range(10):
-            sim = Simulator(8)
+            sim = Simulator(4)
             L1_try, L1_hit, L2_try, L2_hit, L1_rw, L2_rw, DRAM_rw, time, penalty = sim.simulate(name)
             L1HitRate.append(L1_hit/L1_try)
             L2HitRate.append(L2_hit/L2_try)
@@ -278,8 +277,11 @@ if __name__ == "__main__":
 
             penalties.append(penalty)
             times.append(time)
+            access = (L1_hit * 0.5 + L2_hit * 5 + (L2_try - L2_hit) * 50)/L1_try
+            access_times.append(access)
 
-        print("Avg time: ", statistics.mean(times), "ns","-------- Std Dev: ", statistics.stdev(times))
+        print("Avg Total Time: ", statistics.mean(times), "ns","-------- Std Dev: ", statistics.stdev(times))
+        print("Avg Access Time: ", statistics.mean(access_times), "ns","-------- Std Dev: ", statistics.stdev(access_times))
         print()
         print("Avg L1 Hit Rate: ", statistics.mean(L1HitRate),"-------- Std Dev: ", statistics.stdev(L1HitRate))
         print("Avg L2 Hit Rate: ", statistics.mean(L2HitRate),"-------- Std Dev: ", statistics.stdev(L2HitRate))
@@ -294,28 +296,7 @@ if __name__ == "__main__":
         print("Avg DRAM Static Energy: ", statistics.mean(DRAMStaticEnergy), "W","-------- Std Dev: ", statistics.stdev(DRAMStaticEnergy))
         print()
         print("Avg Penalty: ", statistics.mean(penalties), "pJ","-------- Std Dev: ", statistics.stdev(penalties))
-        table.append(name.upper())
-        table.append(statistics.mean(times))
-        table.append(statistics.stdev(times))
-        table.append(statistics.mean(L1ActiveEnergy))
-        table.append(statistics.stdev(L1ActiveEnergy))
-        table.append(statistics.mean(L1StaticEnergy))
-        table.append(statistics.stdev(L1StaticEnergy))
-        table.append(statistics.mean(L2ActiveEnergy))
-        table.append(statistics.stdev(L2ActiveEnergy))
-        table.append(statistics.mean(L2StaticEnergy))
-        table.append(statistics.stdev(L2StaticEnergy))
-        table.append(statistics.mean(DRAMActiveEnergy))
-        table.append(statistics.stdev(DRAMActiveEnergy))
-        table.append(statistics.mean(DRAMStaticEnergy))
-        table.append(statistics.stdev(DRAMStaticEnergy))
-        table.append(statistics.mean(penalties))
-        table.append(statistics.stdev(penalties))
-        table_data.append(table)
-
-    print(tabulate(table_data, headers=["File Name", "Avg Time", "StdDev Time", "Avg L1 Active (W)", "StdDev L1 Active", "Avg L1 Static (W)", "StDev L1 Static", "Avg L2 Active (W)", "StdDev L2 Active", "Avg L2 Static (W)", "StDev L2 Static", "Avg DRAM Active (W)", "StdDev DRAM Active", "Avg DRAM Static(W)", "StDev DRAM Static", "Avg Penalty (jP)", "StdDev Penalty"]))
-
-    
+        
 
 
 
