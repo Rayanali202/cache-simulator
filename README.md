@@ -18,11 +18,14 @@ Writes works pretty similar to reads with slight differences. We start by checki
 **2 Set Associativity**
 ![Image Alt Text](images/2sets1.png)
 ![Image Alt Text](images/2sets2.png)
+![Image Alt Text](images/2sets3.png)
 
 **4 Set Associativity**
 ![Image Alt Text](images/4sets1.png)
 ![Image Alt Text](images/4sets2.png)
+![Image Alt Text](images/4sets3.png)
 
 **8 Set Associativity**
 ![Image Alt Text](images/8sets1.png)
 ![Image Alt Text](images/8sets2.png)
+![Image Alt Text](images/8sets3.png)
