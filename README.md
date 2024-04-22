@@ -19,5 +19,6 @@ Writes works pretty similar to reads with slight differences. We start by checki
 
 **4 Set Associativity**
 ![Image Alt Text](4sets1.png)
+![Image Alt Text](4sets2.png)
 
 **8 Set Associativity**
