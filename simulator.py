@@ -46,9 +46,9 @@ class Simulator:
                 binaryAddress = self.hexToBinary(values[1])
                 offset = binaryAddress[-6:]
                 index_L1 = int(binaryAddress[-15:-6], 2) % 499
-                index_L2 = int(binaryAddress[-16:-6], 2) % (int(4000/self.associativity) - 1)
+                index_L2 = int(binaryAddress[-15:-6], 2) % 499
                 tag_L1 = int(binaryAddress[:-15], 2)
-                tag_L2 = int(binaryAddress[:-16], 2)
+                tag_L2 = int(binaryAddress[:-15], 2)
 
                 if op == '0':
                     gotHit = False
@@ -96,7 +96,7 @@ class Simulator:
                         # empty spot not found replace random cache line
                         if not stored:
                             time += 5
-                            idx = random.randint(0, 3)
+                            idx = random.randint(0, self.associativity - 1)
                             self.ran += 1
                             '''if self.L2.data[index_L2][idx].dirty:
                                 print("WRITE BACK TO MEMORY")'''
@@ -256,7 +256,7 @@ if __name__ == "__main__":
         times = []
         # run trace ten times
         for _ in range(10):
-            sim = Simulator(4)
+            sim = Simulator(8)
             L1_try, L1_hit, L2_try, L2_hit, L1_rw, L2_rw, DRAM_rw, time, penalty = sim.simulate(name)
             L1HitRate.append(L1_hit/L1_try)
             L2HitRate.append(L2_hit/L2_try)

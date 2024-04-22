@@ -16,9 +16,13 @@ Writes works pretty similar to reads with slight differences. We start by checki
 # Results 
 
 **2 Set Associativity**
+![Image Alt Text](2sets1.png)
+![Image Alt Text](2sets2.png)
 
 **4 Set Associativity**
 ![Image Alt Text](4sets1.png)
 ![Image Alt Text](4sets2.png)
 
 **8 Set Associativity**
+![Image Alt Text](8sets1.png)
+![Image Alt Text](8sets2.png)
