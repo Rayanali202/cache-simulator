@@ -4,7 +4,7 @@ Program starts by converting hex address to a 32 bit binary string. Starting fro
 
 ![Image Alt Text](bits.png)
 
-**Code Explanation***
+**Code Explanation**
 The logic behind the cache simulator occurs in the 'simulate()' function in the Simulator class.
 
 **Read:**
@@ -12,5 +12,7 @@ In the case of a read we start by checking the L1 cache at the L1_index for a ta
 
 **Write:**
 Writes are asynchronus so we don't really have to care for the time penalty. However, if an asychronus write occurs at the end of our read time it does matter so we keep track of a variable called 'async_time'. For example, if we have to write to L1 we get an asynchronus time penalty of 0.5nsec, so we set async_time to the max of (async_time, current_time + 0.5). If at the end of our simulation async_time is greater than current_time (just 'time' in the code), then the final run time is set to async_time.
+
+![Image Alt Text](bits.png)
 
 Writes works pretty similar to reads. We start by checking L1 for a tag match. If we miss we go to L2. If we get a hit on the L2 cache then we write to L2 and move the updated cache line up to L1, we also mark the cache line as dirty. We also incur a 5pj penalty for moving data from L2 to L1. If both L1 and L2 miss we bring the cache line in from DRAM and replace a cache line in L2. We also update the respective cache line in L1 with the newly brought in cache line to maintain inclusivity. This takes no time according to specifications on Ed Discussion but we incur a penalty of 640pj for moving data between DRAM and L2 and 5pj for moving data between L2 and L1.
